@@ -24,14 +24,20 @@ def compare_excel_files(file1, file2, output_file, primary_key):
             cell = ws2.cell(row=row, column=primary_key)
             rows_dict2[cell.value] = [cell.value] + [cell2.value for cell2 in ws2[row]]
 
-    # Copy the data from the first workbook to the difference workbook with column names
+    # Copy the data from the second workbook to the difference workbook with column names
     diff_ws.append([cell.value for cell in ws2[1]])
 
     for primary_key_value, row2 in rows_dict2.items():
         row1 = rows_dict1.get(primary_key_value)
 
         if row1:
-            diff_ws.append(row2 if row2[1:] != row1[1:] else row1)
+            diff_row = []
+            for col in range(len(row2)):
+                if col == 0 or row1[col] != row2[col]:
+                    diff_row.append(row2[col])
+                else:
+                    diff_row.append(None)
+            diff_ws.append(diff_row)
 
     # Compare the cells in both workbooks and highlight the differences
     for row in range(2, diff_ws.max_row + 1):
@@ -53,4 +59,3 @@ output_file = "difference.xlsx"
 primary_key = 1  # Assuming primary key column is 1st column (A)
 
 compare_excel_files(file1, file2, output_file, primary_key)
-
