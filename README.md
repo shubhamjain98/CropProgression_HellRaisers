@@ -32,11 +32,9 @@ def compare_excel_files(file1, file2, output_file, primary_key):
 
         if row1:
             diff_row = [None] * len(row2)
-            for col in range(len(row2)):
-                if col == 0:
+            for col in range(1, len(row2)):
+                if row1[col] != row2[col]:
                     diff_row[col] = row2[col]
-                elif row1[col] != row2[col]:
-                    diff_row[col-1] = row2[col]
 
             diff_ws.append(diff_row)
 
@@ -46,9 +44,9 @@ def compare_excel_files(file1, file2, output_file, primary_key):
             cell1 = rows_dict1.get(diff_ws.cell(row=row, column=primary_key).value)
             cell2 = diff_ws.cell(row=row, column=col)
 
-            if cell1 and cell1[col - 1] != cell2.value:
+            if cell1 and cell1[col] != cell2.value:
                 cell2.font = openpyxl.styles.Font(color="FF0000")
-                cell2.comment = openpyxl.comments.Comment(f"Original Value: {cell1[col - 1]}", "Author")
+                cell2.comment = openpyxl.comments.Comment(f"Original Value: {cell1[col]}", "Author")
 
     diff_wb.save(output_file)
     print(f"Differences saved in {output_file}")
