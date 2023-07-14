@@ -31,12 +31,13 @@ def compare_excel_files(file1, file2, output_file, primary_key):
         row1 = rows_dict1.get(primary_key_value)
 
         if row1:
-            diff_row = []
+            diff_row = [None] * len(row2)
             for col in range(len(row2)):
-                if col == 0 or row1[col] != row2[col]:
-                    diff_row.append(row2[col])
-                else:
-                    diff_row.append(None)
+                if col == 0:
+                    diff_row[col] = row2[col]
+                elif row1[col] != row2[col]:
+                    diff_row[col-1] = row2[col]
+
             diff_ws.append(diff_row)
 
     # Compare the cells in both workbooks and highlight the differences
