@@ -33,15 +33,15 @@ def compare_excel_files(file1, file2, output_file, primary_keys):
         row1 = rows_dict1.get(primary_key_values)
 
         if row1:
-            diff_row = [None] * len(row2)
-            for col, (cell1, cell2) in enumerate(zip(row1, row2), start=2):
+            diff_row = [None] * (len(row2) + 1)  # Increased length by 1 for primary key column
+            for col, (cell1, cell2) in enumerate(zip(row1, row2), start=1):  # Start at 1 for primary key column
                 if cell1 != cell2:
                     diff_row[col] = cell2
-                    diff_ws.cell(row=row, column=col).font = openpyxl.styles.Font(color="FF0000")
-                    diff_ws.cell(row=row, column=col).comment = openpyxl.comments.Comment(f"Original Value: {cell1}", "Author")
+                    diff_ws.cell(row=row, column=col+1).font = openpyxl.styles.Font(color="FF0000")
+                    diff_ws.cell(row=row, column=col+1).comment = openpyxl.comments.Comment(f"Original Value: {cell1}", "Author")
             diff_ws.append(diff_row)
         else:
-            diff_ws.append([None] + row2)
+            diff_ws.append([primary_key_values[0]] + row2)  # Include the primary key column value
 
     diff_wb.save(output_file)
     print(f"Differences saved in {output_file}")
