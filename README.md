@@ -33,8 +33,9 @@ def compare_excel_files(file1, file2, output_file, primary_keys):
         row1 = rows_dict1.get(primary_key_values)
 
         if row1:
-            diff_row = [None] * (len(row2) + 1)  # Increased length by 1 for primary key column
-            for col, (cell1, cell2) in enumerate(zip(row1, row2), start=1):  # Start at 1 for primary key column
+            diff_row = [primary_key_values[0]] + [None] * (len(row2))  # Initialize diff_row with primary key value
+            for col, cell2 in enumerate(row2, start=1):
+                cell1 = row1[col-1]  # Adjust indexing for row1
                 if cell1 != cell2:
                     diff_row[col] = cell2
                     diff_ws.cell(row=row, column=col+1).font = openpyxl.styles.Font(color="FF0000")
