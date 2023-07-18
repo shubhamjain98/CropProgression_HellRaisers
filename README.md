@@ -24,25 +24,23 @@ def compare_excel_files(file1, file2, output_file, primary_keys):
             primary_key_values = tuple(ws2.cell(row=row, column=col).value for col in primary_keys)
             rows_dict2[primary_key_values] = [cell.value for cell in ws2[row][1:]]
 
-    # Copy the data from the second workbook to the difference workbook with column names
-    for col, cell in enumerate(ws2[1][1:], start=2):
+    # Copy the data from the first workbook to the difference workbook with column names
+    for col, cell in enumerate(ws1[1][1:], start=2):
         diff_ws.cell(row=1, column=col, value=cell.value)
 
     # Compare the cells in both workbooks and highlight the differences
-    for row, (primary_key_values, row2) in enumerate(rows_dict2.items(), start=2):
-        row1 = rows_dict1.get(primary_key_values)
+    for row, (primary_key_values, row1) in enumerate(rows_dict1.items(), start=2):
+        row2 = rows_dict2.get(primary_key_values)
 
-        if row1:
+        if row2:
             diff_row = [primary_key_values[0]] + [None] * (len(row2))  # Initialize diff_row with primary key value
-            for col, cell2 in enumerate(row2, start=1):
-                cell1 = row1[col-1]  # Adjust indexing for row1
+            for col, cell1 in enumerate(row1, start=1):
+                cell2 = row2[col-1]  # Adjust indexing for row2
                 if cell1 != cell2:
                     diff_row[col] = cell2
                     diff_ws.cell(row=row, column=col+1).font = openpyxl.styles.Font(color="FF0000")
                     diff_ws.cell(row=row, column=col+1).comment = openpyxl.comments.Comment(f"Original Value: {cell1}", "Author")
             diff_ws.append(diff_row)
-        else:
-            diff_ws.append([primary_key_values[0]] + row2)  # Include the primary key column value
 
     diff_wb.save(output_file)
     print(f"Differences saved in {output_file}")
