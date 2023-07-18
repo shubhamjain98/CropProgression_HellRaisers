@@ -22,23 +22,24 @@ def compare_excel_files(file1, file2, output_file, primary_keys):
         # Populate rows_dict2 with rows from the second file
         for row in range(2, ws2.max_row + 1):
             primary_key_values = tuple(ws2.cell(row=row, column=col).value for col in primary_keys)
-            rows_dict2[primary_key_values] = [cell.value for cell in ws2[row][2:]]
+            rows_dict2[primary_key_values] = [cell.value for cell in ws2[row]]
 
     # Copy the data from the first workbook to the difference workbook with column names
-    for col, cell in enumerate(ws1[1][2:], start=2):
-        diff_ws.cell(row=1, column=col, value=cell.value)
+    column_names = ["Column 2"] + [cell.value for cell in ws1[1][3:]]
+    diff_ws.append(column_names)
 
     # Compare the cells in both workbooks and highlight the differences
-    for row, (primary_key_values, row1) in enumerate(rows_dict1.items(), start=2):
+    for primary_key_values, row1 in rows_dict1.items():
         row2 = rows_dict2.get(primary_key_values)
 
         if row2:
             diff_row = [row1[0]] + [None] * (len(row1) - 1)  # Initialize diff_row with primary key value
-            for col, (cell1, cell2) in enumerate(zip(row1[1:], row2), start=2):
+            for col, (cell1, cell2) in enumerate(zip(row1[1:], row2[1:]), start=1):
                 if cell1 != cell2:
                     diff_row[col] = cell2
-                    diff_ws.cell(row=row, column=col).font = openpyxl.styles.Font(color="FF0000")
-                    diff_ws.cell(row=row, column=col).comment = openpyxl.comments.Comment(f"Original Value: {cell1}", "Author")
+                    cell = diff_ws.cell(row=len(diff_ws["A"]) + 1, column=col + 1)
+                    cell.font = openpyxl.styles.Font(color="FF0000")
+                    cell.comment = openpyxl.comments.Comment(f"Original Value: {cell1}", "Author")
             diff_ws.append(diff_row)
 
     diff_wb.save(output_file)
