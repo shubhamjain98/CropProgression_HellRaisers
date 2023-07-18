@@ -34,10 +34,10 @@ def compare_excel_files(file1, file2, output_file, primary_keys):
 
         if row2:
             diff_row = []
-            for cell1, cell2 in zip(row1, row2):
+            for col, (cell1, cell2) in enumerate(zip(row1, row2), start=1):
                 if cell1 != cell2:
                     diff_row.append(cell2)
-                    cell = diff_ws.cell(row=len(diff_ws["A"]) + 1, column=len(diff_row))
+                    cell = diff_ws.cell(row=len(diff_ws["A"]) + 1, column=col)
                     cell.font = openpyxl.styles.Font(color="FF0000")
                     cell.comment = openpyxl.comments.Comment(f"Original Value: {cell1}", "Author")
                 else:
